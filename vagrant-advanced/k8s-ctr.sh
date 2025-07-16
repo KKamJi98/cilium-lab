@@ -45,8 +45,8 @@ kubectl config rename-context "kubernetes-admin@kubernetes" "HomeLab" >/dev/null
 
 
 echo "[TASK 6] Install Kubeps & Setting PS1"
-# echo "192.168.10.100 cilium-m1" >> /etc/hosts
-# for (( i=1; i<=$1; i++  )); do echo "192.168.10.10$i cilium-w$i" >> /etc/hosts; done
+echo "192.168.10.100 cilium-m1" >> /etc/hosts
+for (( i=1; i<=$1; i++  )); do echo "192.168.10.10$i cilium-w$i" >> /etc/hosts; done
 
 
 echo ">>>> K8S Controlplane Config End <<<<"
