@@ -1,0 +1,22 @@
+# Created by https://www.toptal.com/developers/gitignore/api/vagrant,powershell
+# Edit at https://www.toptal.com/developers/gitignore?templates=vagrant,powershell
+
+### PowerShell ###
+# Exclude packaged modules
+*.zip
+
+# Exclude .NET assemblies from source
+*.dll
+
+### Vagrant ###
+# General
+.vagrant/
+.vagrant.d/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.log
+
+### Vagrant Patch ###
+*.box
+
+# End of https://www.toptal.com/developers/gitignore/api/vagrant,powershell
