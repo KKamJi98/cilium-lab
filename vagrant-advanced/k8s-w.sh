@@ -2,9 +2,11 @@
 
 echo ">>>> K8S Node config Start <<<<"
 
+echo "[TASK 0] Setting Node IP"
+sed -i "s/__NODE_IP__/$1/g" /opt/configurations/join-configuration.yaml
+
 echo "[TASK 1] K8S Controlplane Join"
-# Vagrantfile에서 전달받은 IP 주소($1)를 노드 IP로 사용하여 join을 실행함.
-kubeadm join --config /vagrant/configurations/join-configuration.yaml --node-ip=$1
+kubeadm join --config /opt/configurations/join-configuration.yaml
 
 
 echo ">>>> K8S Node config End <<<<"

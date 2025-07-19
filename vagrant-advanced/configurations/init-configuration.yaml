@@ -11,15 +11,21 @@ bootstrapTokens: # 클러스터에 노드를 추가할 때 사용할 토큰을 �
 nodeRegistration: # 컨트롤 플레인 노드를 kubelet에 등록하는 방법을 정의
   criSocket: "unix:///run/containerd/containerd.sock" # 사용할 컨테이너 런타임 인터페이스(CRI) 소켓을 지정
 localAPIEndpoint: #Contorl Plane Node의 API 서버 엔드포인트를 지정
-  advertiseAddress: "192.168.10.100" # 다른 클러스터 Node에게 광고할 IP 주소
+  advertiseAddress: "__NODE_IP__" # 다른 클러스터 Node에게 광고할 IP 주소 "__NODE_IP__" => PlaceHolder
   bindPort: 6443 # API 서버가 바인딩할 포트.
 ---
 # ClusterConfiguration: 전체 클러스터의 설정을 정의
 apiVersion: kubeadm.k8s.io/v1beta4
 kind: ClusterConfiguration
 kubernetesVersion: "v1.33.2" # 사용할 쿠버네티스 버전을 지정
-controlPlaneEndpoint: "192.168.10.100:6443" # 모든 컨트롤 플레인 노드의 공유 엔드포인트. 고가용성(HA) 클러스터의 경우 로드 밸런서 주소
+controlPlaneEndpoint: "__NODE_IP__:6443" # 모든 컨트롤 플레인 노드의 공유 엔드포인트. 고가용성(HA) 클러스터의 경우 로드 밸런서 주소
 networking: # 클러스터의 네트워크 매개변수를 정의
   serviceSubnet: "10.96.0.0/16" # 서비스 IP 주소에 사용할 CIDR 블록
   podSubnet: "10.244.0.0/16" #  파드 IP 주소에 사용할 CIDR 블록. CNI 플러그인이 해당 설정을 사용
   dnsDomain: "cluster.local" # 클러스터 내부 DNS에 사용할 도메인 이름(FQDN)
+apiServer:
+  certSANs:
+    - 10.96.0.1          # 서비스 클러스터 IP
+    - __NODE_IP__        # "__NODE_IP__" => PlaceHolder
+    - 192.168.0.2        # Local에서 직접 접근을 위해 새로 추가할 호스트 IP
+    - 127.0.0.1          # (선택) 로컬 포트포워드용

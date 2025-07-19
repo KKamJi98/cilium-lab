@@ -2,8 +2,11 @@
 
 echo ">>>> K8S Controlplane config Start <<<<"
 
+echo "[TASK 0] Setting Node IP"
+sed -i "s/__NODE_IP__/$1/g" /opt/configurations/init-configuration.yaml
+
 echo "[TASK 1] Initial Kubernetes"
-kubeadm init --config /vagrant/configurations/init-configuration.yaml > /dev/null 2>&1
+kubeadm init --config /opt/configurations/init-configuration.yaml > /dev/null 2>&1
 
 
 echo "[TASK 2] Setting kube config file"
@@ -46,7 +49,7 @@ kubectl config rename-context "kubernetes-admin@kubernetes" "HomeLab" >/dev/null
 
 echo "[TASK 6] Install Kubeps & Setting PS1"
 echo "192.168.10.100 cilium-m1" >> /etc/hosts
-for (( i=1; i<=$1; i++  )); do echo "192.168.10.10$i cilium-w$i" >> /etc/hosts; done
+for (( i=1; i<=$2; i++  )); do echo "192.168.10.10$i cilium-w$i" >> /etc/hosts; done
 
 
 echo ">>>> K8S Controlplane Config End <<<<"
