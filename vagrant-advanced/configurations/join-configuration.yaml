@@ -9,7 +9,6 @@ discovery: # 클러스터를 찾고 조인하는 방법을 정의
     apiServerEndpoint: "192.168.10.100:6443" # 조인할 컨트롤 플레인의 주소
     token: "123456.1234567890123456" # token: 클러스터 인증에 사용할 부트스트랩 토큰. 'kubeadm init'으로 생성된 토큰과 일치해야 함
     unsafeSkipCAVerification: true # CA 인증서 해시를 확인하지 않고 조인. 테스트 환경에서만 사용 권장. 프로덕션 환경에서는 'caCertHashes' 사용
-  timeout: 5m
 nodeRegistration: # 워커 노드를 kubelet에 등록하는 방법을 정의
   criSocket: "unix:///run/containerd/containerd.sock" # 사용할 컨테이너 런타임 인터페이스(CRI) 소켓을 지정
   kubeletExtraArgs:
