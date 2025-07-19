@@ -4,7 +4,7 @@ Vagrant와 VirtualBox를 사용하여 Kubernetes 클러스터를 구축하고 Ci
 
 ## 디렉토리 구조
 
-이 프로젝트는 두 가지 버전의 Kubernetes 클러스터 구성 환경을 제공합니다.
+두 가지 버전의 Kubernetes 클러스터 구성 환경을 제공합니다.
 
 - **`vagrant-original/`**: `kubeadm`의 모든 옵션을 명령줄 인자로 전달하는 전통적인 방식을 사용하여 Kubernetes 클러스터를 구성합니다.
 - **`vagrant-advanced/`**: `kubeadm`의 `InitConfiguration`, `JoinConfiguration` 등 YAML 설정 파일을 사용하여 좀 더 선언적이고 체계적인 방식으로 Kubernetes 클러스터를 구성합니다.
