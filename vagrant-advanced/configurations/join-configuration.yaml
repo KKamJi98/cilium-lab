@@ -13,4 +13,4 @@ nodeRegistration: # 워커 노드를 kubelet에 등록하는 방법을 정의
   criSocket: "unix:///run/containerd/containerd.sock" # 사용할 컨테이너 런타임 인터페이스(CRI) 소켓을 지정
   kubeletExtraArgs:
     - name: node-ip
-      value=: "__NODE_IP__" # 노드의 IP 주소를 지정. '__NODE_IP__'는 노드의 IP 주소를 나타내는 플레이스홀더
+      value: "__NODE_IP__" # 노드의 IP 주소를 지정. '__NODE_IP__'는 노드의 IP 주소를 나타내는 플레이스홀더
