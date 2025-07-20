@@ -3,10 +3,10 @@
 echo ">>>> K8S Controlplane config Start <<<<"
 
 echo "[TASK 0] Setting Node IP"
-sed -i "s/__NODE_IP__/$1/g" /opt/configurations/init-configuration.yaml
+sed -i "s/__NODE_IP__/$1/g" /tmp/configurations/init-configuration.yaml
 
 echo "[TASK 1] Initial Kubernetes"
-kubeadm init --config /opt/configurations/init-configuration.yaml > /dev/null 2>&1
+kubeadm init --config /tmp/configurations/init-configuration.yaml > /dev/null 2>&1
 
 
 echo "[TASK 2] Setting kube config file"
