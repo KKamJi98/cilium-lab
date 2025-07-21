@@ -21,7 +21,7 @@ sed -i "s/__NODE_IP__/$NODE_IP/g" /tmp/configurations/init-configuration.yaml
 sed -i "s/__KUBERNETES_VERSION__/v$K8S_SEMVER/g" /tmp/configurations/init-configuration.yaml
 
 echo "[TASK 1] Initial Kubernetes"
-kubeadm init --config /tmp/configurations/init-configuration.yaml --skip-phases=addon/kube-proxy > /dev/null 2>&1
+kubeadm init --config /tmp/configurations/init-configuration.yaml > /dev/null 2>&1
 
 
 echo "[TASK 2] Setting kube config file"
