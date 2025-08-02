@@ -1,0 +1,22 @@
+hubble:
+  export:
+    static:
+      enabled: true
+      filePath: /var/run/cilium/hubble/events.log
+      allowList:
+        - {"verdict":["DROPPED","ERROR"]}
+      denyList:
+        - {"source_pod":["kube-system"]}
+      fieldMask:
+        - time
+        - source.namespace
+        - source.pod_name
+        - destination.namespace
+        - destination.pod_name
+        - verdict
+        - http.method
+        - http.url
+      rotate:
+        enabled: true
+        maxSize: 100
+        maxBackups: 10

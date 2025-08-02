@@ -1,0 +1,21 @@
+hubble:
+  export:
+    dynamic:
+      enabled: true
+      config:
+        enabled: true
+        content:
+          - name: all-forwarded
+            filePath: /var/run/cilium/hubble/all-forwarded.log
+            includeFilters:
+              - verdict: ["FORWARDED"]
+            fieldMask:
+              - time
+              - verdict
+              - source.namespace
+              - source.pod_name
+              - destination.namespace
+              - destination.pod_name
+              - l4
+              - is_reply
+              - node_name
