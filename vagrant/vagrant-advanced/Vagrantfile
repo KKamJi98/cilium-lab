@@ -3,7 +3,7 @@ K8SV = '1.33.2-1.1' # Kubernetes Version : apt list -a kubelet , ex) 1.32.5-1.1
 CONTAINERDV = '1.7.27-1' # Containerd Version : apt list -a containerd.io , ex) 1.6.33-1
 CILIUMV = '1.17.6' # Cilium CNI Version : https://github.com/cilium/cilium/tags
 
-N = 2 # max number of worker nodes
+N = 1 # max number of worker nodes
 MASTER_IP = "192.168.10.100"
 WORKER_IP_PREFIX = "192.168.10.10"
 
@@ -23,8 +23,8 @@ Vagrant.configure("2") do |config|
       vb.customize ["modifyvm", :id, "--groups", "/Cilium-Lab"]
       vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       vb.name = "cilium-m1"
-      vb.cpus = 2
-      vb.memory = 2048
+      vb.cpus = 3
+      vb.memory = 3072
       vb.linked_clone = true
     end
     subconfig.vm.host_name = "cilium-m1"
@@ -50,8 +50,8 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--groups", "/Cilium-Lab"]
         vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
         vb.name = "cilium-w#{i}"
-        vb.cpus = 2
-        vb.memory = 1536
+        vb.cpus = 3
+        vb.memory = 3072
         vb.linked_clone = true
       end
       subconfig.vm.host_name = "cilium-w#{i}"
