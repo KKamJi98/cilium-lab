@@ -2,10 +2,10 @@
 
 echo ">>>> Initial Config Start <<<<"
 
-echo "[TASK 1] Setting Profile & Change Timezone"
+echo "[TASK 1] Setting Profile & Bashrc"
 echo 'alias vi=vim' >> /etc/profile
 echo "sudo su -" >> /home/vagrant/.bashrc
-ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
+ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime # Change Timezone
 
 
 echo "[TASK 2] Disable AppArmor"
@@ -64,7 +64,8 @@ systemctl enable --now kubelet
 
 
 echo "[TASK 6] Install Packages & Helm"
-apt-get install -y bridge-utils sshpass net-tools conntrack ngrep tcpdump ipset arping wireguard jq tree bash-completion unzip kubecolor >/dev/null 2>&1
+export DEBIAN_FRONTEND=noninteractive
+apt-get install -y bridge-utils sshpass net-tools conntrack ngrep tcpdump ipset arping wireguard jq yq tree bash-completion unzip kubecolor termshark >/dev/null 2>&1
 curl -s https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash >/dev/null 2>&1
 
 
