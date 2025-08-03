@@ -67,14 +67,19 @@ helm repo add cilium https://helm.cilium.io/ >/dev/null 2>&1
 helm repo update >/dev/null 2>&1
 helm install cilium cilium/cilium --version $CILIUM_VERSION --namespace kube-system \
 --set k8sServiceHost=192.168.10.100 --set k8sServicePort=6443 \
+# --set ipam.mode="kubernetes" --set k8s.requireIPv4PodCIDR=true --set ipv4NativeRoutingCIDR=10.244.0.0/16 \
 --set ipam.mode="cluster-pool" --set ipam.operator.clusterPoolIPv4PodCIDRList={"172.20.0.0/16"} --set ipv4NativeRoutingCIDR=172.20.0.0/16 \
 --set routingMode=native --set autoDirectNodeRoutes=true --set endpointRoutes.enabled=true \
 --set kubeProxyReplacement=true --set bpf.masquerade=true --set installNoConntrackIptablesRules=true \
 --set endpointHealthChecking.enabled=false --set healthChecking=false \
---set hubble.enabled=false --set operator.replicas=1 --set debug.enabled=true >/dev/null 2>&1
+--set hubble.enabled=true --set hubble.relay.enabled=true --set hubble.ui.enabled=true \
+--set hubble.ui.service.type=NodePort --set hubble.ui.service.nodePort=30003 \
+--set prometheus.enabled=true --set operator.prometheus.enabled=true --set hubble.metrics.enableOpenMetrics=true \
+--set hubble.metrics.enabled="{dns,drop,tcp,flow,port-distribution,icmp,httpV2:exemplars=true;labelsContext=source_ip\,source_namespace\,source_workload\,destination_ip\,destination_namespace\,destination_workload\,traffic_direction}" \
+--set operator.replicas=1 --set debug.enabled=true >/dev/null 2>&1
 
 
-echo "[TASK 8] Install Cilium CLI"
+echo "[TASK 8] Install Cilium / Hubble CLI"
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
 CLI_ARCH=amd64
 if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
@@ -82,10 +87,31 @@ curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/d
 tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz
 
+HUBBLE_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/hubble/master/stable.txt)
+HUBBLE_ARCH=amd64
+if [ "$(uname -m)" = "aarch64" ]; then HUBBLE_ARCH=arm64; fi
+curl -L --fail --remote-name-all https://github.com/cilium/hubble/releases/download/$HUBBLE_VERSION/hubble-linux-${HUBBLE_ARCH}.tar.gz >/dev/null 2>&1
+tar xzvfC hubble-linux-${HUBBLE_ARCH}.tar.gz /usr/local/bin
+rm hubble-linux-${HUBBLE_ARCH}.tar.gz
 
-echo "[TASK 9] Install Kubeps & Setting PS1"
+echo "[TASK 9] Remove node taint"
+kubectl taint nodes cilium-m1 node-role.kubernetes.io/control-plane-
+
+
+echo "[TASK 10] local DNS with hosts file"
 echo "192.168.10.100 cilium-m1" >> /etc/hosts
 for (( i=1; i<=$WORKER_COUNT; i++  )); do echo "192.168.10.10$i cilium-w$i" >> /etc/hosts; done
+
+
+echo "[TASK 11] Install Prometheus & Grafana"
+kubectl apply -f https://raw.githubusercontent.com/cilium/cilium/1.17.6/examples/kubernetes/addons/prometheus/monitoring-example.yaml >/dev/null 2>&1
+kubectl patch svc -n cilium-monitoring prometheus -p '{"spec": {"type": "NodePort", "ports": [{"port": 9090, "targetPort": 9090, "nodePort": 30001}]}}' >/dev/null 2>&1
+kubectl patch svc -n cilium-monitoring grafana -p '{"spec": {"type": "NodePort", "ports": [{"port": 3000, "targetPort": 3000, "nodePort": 30002}]}}' >/dev/null 2>&1
+
+
+echo "[TASK 12] Dynamically provisioning persistent local storage with Kubernetes"
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.31/deploy/local-path-storage.yaml >/dev/null 2>&1
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}' >/dev/null 2>&1
 
 
 echo ">>>> K8S Controlplane Config End <<<<"
