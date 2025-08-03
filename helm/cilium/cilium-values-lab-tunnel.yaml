@@ -1,0 +1,88 @@
+#########################
+# cilium-values-lab-tunnel.yaml (tunnel mode)
+#########################
+
+# Kubernetes API 서버 (Vagrant + VirtualBox 환경)
+k8sServiceHost: 192.168.10.100
+k8sServicePort: 6443
+
+# IPAM: cluster-pool 유지
+ipam:
+  mode: cluster-pool
+  operator:
+    clusterPoolIPv4PodCIDRList:
+      - "172.20.0.0/16"   # 노드별 /24 자동 분배
+
+# 라우팅: 터널 모드
+routingMode: tunnel
+tunnelProtocol: vxlan
+
+# 네이티브 전용 옵션 비활성화
+autoDirectNodeRoutes: false
+ipv4NativeRoutingCIDR: ""        # 또는 키 자체를 제거해도 됨
+endpointRoutes:
+  enabled: false                 # 터널 모드에서는 사용하지 않음
+
+# kube-proxy 대체 및 SNAT
+kubeProxyReplacement: true
+bpf:
+  masquerade: true
+
+# 네이티브 전용: conntrack iptables 미설치 옵션 비활성화
+installNoConntrackIptablesRules: false
+
+# HealthCheck
+endpointHealthChecking:
+  enabled: false
+healthChecking: false
+
+# 디버그
+debug:
+  enabled: true
+
+# Operator
+operator:
+  replicas: 1
+  prometheus:
+    enabled: true
+
+# Prometheus Metrics (에이전트)
+prometheus:
+  enabled: true
+
+# Hubble
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+    service:
+      type: NodePort
+      nodePort: 30003
+
+  export:
+    static:
+      enabled: true
+      filePath: /var/run/cilium/hubble/events.log
+
+  metrics:
+    enableOpenMetrics: true
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - httpV2
+    httpV2:
+      exemplars: true
+      labelsContext:
+        - source_ip
+        - source_namespace
+        - source_workload
+        - destination_ip
+        - destination_namespace
+        - destination_workload
+        - traffic_direction
