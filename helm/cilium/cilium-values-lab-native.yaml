@@ -1,0 +1,87 @@
+#########################
+# cilium-values-lab.yaml
+#########################
+
+# Kubernetes API 서버 Config (Vagrant + VirtualBox를 사용할 경우 eth0번이 SNAT 10.0.2.15로 사용되기 때문에 지정)
+k8sServiceHost: 192.168.10.100 # kube‑apiserver IP
+k8sServicePort: 6443 # kube‑apiserver Port
+
+
+ipam:
+  mode: cluster-pool # Cilium 자체 풀 사용
+  operator:
+    clusterPoolIPv4PodCIDRList: # 노드별 /24 자동 할당 (172.20.x.0/24)
+      - "172.20.0.0/16"
+
+ipv4NativeRoutingCIDR: "172.20.0.0/16"
+
+routingMode: native                # L3 native 모드
+autoDirectNodeRoutes: true         # 노드 간 직접 라우트
+endpointRoutes:
+  enabled: true                    # Pod‑CIDR 대신 eBPF 엔드포인트 라우트
+
+kubeProxyReplacement: true         # kube‑proxy 완전 대체
+bpf:
+  masquerade: true                 # eBPF 기반 SNAT
+
+installNoConntrackIptablesRules: true  # iptables CT 테이블 미설치
+
+# HealthCheck Option (공식문서 내용 추가)
+endpointHealthChecking:
+  enabled: false
+healthChecking: false              # 노드 헬스 체크 비활성화
+
+debug:
+  enabled: true
+
+operator:
+  replicas: 1 
+  prometheus:
+    enabled: true # Operator Metric Expose
+
+# Prometheus Metrics
+prometheus:
+  enabled: true # Cilium Agent 메트릭
+
+hubble:
+  enabled: true # cilium 활성화
+
+  relay:
+    enabled: true # gRPC Relay
+
+  ui:
+    enabled: true
+    service:
+      type: NodePort # NodePort 서비스로 공개 # cluster-ip로 수정 후 ingress 연결 작업 필요
+      nodePort: 30003 # 외부 포트
+
+  # Event Log File
+  export:
+    static:
+      enabled: true
+      filePath: /var/run/cilium/hubble/events.log
+
+  # Metric
+  metrics:
+    enableOpenMetrics: true        # OpenMetrics 포맷
+    # 활성화할 메트릭 리스트
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - httpV2                      # 하단 세부옵션 참고
+
+    # httpV2 세부 설정 (예시)
+    httpV2:
+      exemplars: true              # Prometheus exemplar 지원
+      labelsContext:               # 추가 라벨
+        - source_ip
+        - source_namespace
+        - source_workload
+        - destination_ip
+        - destination_namespace
+        - destination_workload
+        - traffic_direction
